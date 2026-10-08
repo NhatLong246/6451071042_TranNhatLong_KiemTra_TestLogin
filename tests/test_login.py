@@ -114,13 +114,51 @@ class TestLogin(BaseTest):
         login_page = LoginPage(self.driver)
         login_page.open_page()
         
-        # Đăng nhập sai 3 lần liên tiếp
-        for i in range(3):
-            login_page.login_with_credentials("user_sai_co_tinh", "pass_sai_co_tinh")
-            # Tắt popup báo lỗi sai tài khoản (nếu có alert) để có thể thao tác tiếp
-            login_page.get_alert_text()
+        # Đăng nhập sai 3 lần liên tiếp để ép CAPTCHA xuất hiện (Sử dụng hàm helper)
+        login_page.force_captcha_appear()
             
         # Kiểm tra xem nhãn "Mã bảo mật" (CAPTCHA) có hiện ra trên màn hình không
         is_captcha_visible = login_page.is_captcha_displayed()
         
         assert is_captcha_visible, "Lỗi: Đã đăng nhập sai 3 lần nhưng hệ thống không hiển thị tính năng Mã bảo mật (CAPTCHA) như dự kiến."
+
+    # TC08: Chức năng tải lại Mã bảo mật (Click vào ảnh)
+    def test_tc08_reload_captcha(self):
+        login_page = LoginPage(self.driver)
+        login_page.open_page()
+        
+        # 1. Ép hiển thị CAPTCHA
+        login_page.force_captcha_appear()
+        
+        # 2. Lấy link ảnh (src) hiện tại
+        src_truoc = login_page.get_captcha_image_src()
+        assert src_truoc is not None, "Không tìm thấy ảnh CAPTCHA trên trang"
+        
+        # 3. Click vào ảnh để đổi mã
+        login_page.click_captcha_image()
+        
+        # Đợi 1 chút để ảnh mới được tải về
+        import time
+        time.sleep(2)
+        
+        # 4. Lấy link ảnh sau khi click
+        src_sau = login_page.get_captcha_image_src()
+        
+        # So sánh 2 src xem có khác nhau không (Thông thường hệ thống sẽ thêm chuỗi random/timestamp vào src)
+        assert src_truoc != src_sau, f"Ảnh CAPTCHA không thay đổi sau khi click. SRC vẫn là: {src_truoc}"
+
+    # TC09: Để trống ô Mã bảo mật
+    def test_tc09_empty_captcha(self):
+        pytest.skip("Sẽ implement sau")
+
+    # TC10: Nhập sai Mã bảo mật
+    def test_tc10_wrong_captcha(self):
+        pytest.skip("Sẽ implement sau")
+
+    # TC11: Nhập đúng Mã bảo mật, nhưng sai User/Pass
+    def test_tc11_correct_captcha_wrong_credentials(self):
+        pytest.skip("Sẽ implement sau")
+
+    # TC12: Đăng nhập thành công khi có Mã bảo mật
+    def test_tc12_login_success_with_captcha(self):
+        pytest.skip("Sẽ implement sau")

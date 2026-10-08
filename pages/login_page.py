@@ -18,6 +18,8 @@ class LoginPage(BasePage):
     
     # (Các locator cho phần mã bảo mật CAPTCHA)
     CAPTCHA_LABEL = (By.XPATH, "//*[contains(text(), 'Mã bảo mật') or contains(text(), 'mã bảo mật')]")
+    CAPTCHA_IMAGE = (By.XPATH, "//img[contains(@src, 'captcha') or contains(@id, 'captcha') or contains(@class, 'captcha')]")
+    CAPTCHA_INPUT = (By.XPATH, "//input[contains(@name, 'captcha') or contains(@id, 'captcha')]")
 
     def __init__(self, driver):
         super().__init__(driver)
@@ -93,3 +95,20 @@ class LoginPage(BasePage):
         """Kiểm tra xem trường Mã bảo mật đã hiển thị trên màn hình hay chưa"""
         element = self.wait_for_element_visible(self.CAPTCHA_LABEL)
         return element is not None
+
+    def force_captcha_appear(self):
+        """Hàm tiện ích: Cố tình đăng nhập sai 3 lần để ép hệ thống hiện CAPTCHA"""
+        for _ in range(3):
+            self.login_with_credentials("user_sai", "pass_sai")
+            self.get_alert_text()
+
+    def click_captcha_image(self):
+        """Click vào ảnh CAPTCHA để yêu cầu mã mới"""
+        self.click_element(self.CAPTCHA_IMAGE)
+
+    def get_captcha_image_src(self):
+        """Lấy giá trị src của ảnh CAPTCHA để so sánh xem ảnh đã đổi hay chưa"""
+        element = self.wait_for_element_visible(self.CAPTCHA_IMAGE)
+        if element:
+            return element.get_attribute("src")
+        return None
