@@ -49,6 +49,17 @@ class LoginPage(BasePage):
         """Click nút Đăng nhập bằng e-mail UTC"""
         self.click_element(self.SSO_BUTTON)
 
+    def click_forgot_password(self):
+        """Click link Quên mật khẩu"""
+        self.click_element(self.FORGOT_PWD_LINK)
+
+    def get_forgot_password_href(self):
+        """Lấy giá trị đường dẫn (href) của link Quên mật khẩu"""
+        element = self.wait_for_element_visible(self.FORGOT_PWD_LINK)
+        if element:
+            return element.get_attribute("href")
+        return None
+
     def login_with_enter(self, username, password):
         """Nhập xong user, pass thì ấn phím Enter trên bàn phím"""
         from selenium.webdriver.common.keys import Keys

@@ -98,7 +98,16 @@ class TestLogin(BaseTest):
 
     # TC06: Chức năng "Quên mật khẩu"
     def test_tc06_forgot_password(self):
-        pytest.skip("Sẽ implement sau")
+        login_page = LoginPage(self.driver)
+        login_page.open_page()
+        
+        # Thay vì click để tránh văng ra ứng dụng Mail của máy tính (Outlook, Mail app),
+        # ta sẽ kiểm tra xem thuộc tính href có chứa mailto:hotrokythuat@utc.edu.vn hay không
+        href_value = login_page.get_forgot_password_href()
+        
+        assert href_value is not None, "Không tìm thấy link Quên mật khẩu trên trang."
+        assert "mailto:" in href_value, f"Link không trỏ đến ứng dụng email, thực tế là: {href_value}"
+        assert "hotrokythuat@utc.edu.vn" in href_value, f"Email hỗ trợ không đúng, thực tế là: {href_value}"
 
     # TC07: Kích hoạt cơ chế Mã bảo mật
     def test_tc07_trigger_captcha(self):
