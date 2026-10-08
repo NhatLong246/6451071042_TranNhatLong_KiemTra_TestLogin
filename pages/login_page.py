@@ -3,7 +3,6 @@ from selenium.webdriver.common.by import By
 
 class LoginPage(BasePage):
     """
-    Tương đương LoginPage.java
     Chứa các Web Elements (Locators) và các thao tác nghiệp vụ đặc thù trên trang Đăng nhập.
     """
     
@@ -45,3 +44,20 @@ class LoginPage(BasePage):
         self.enter_username(username)
         self.enter_password(password)
         self.click_login()
+
+    def get_alert_text(self):
+        """Lấy text từ popup cảnh báo (Alert JS) nếu hệ thống dùng Alert"""
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        from selenium.common.exceptions import TimeoutException
+        try:
+            alert = WebDriverWait(self.driver, 3).until(EC.alert_is_present())
+            text = alert.text
+            alert.accept()
+            return text
+        except TimeoutException:
+            return ""
+
+    def get_page_source(self):
+        """Lấy toàn bộ HTML của trang để tìm text lỗi (nếu lỗi in thẳng ra màn hình)"""
+        return self.driver.page_source
