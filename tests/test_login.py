@@ -167,7 +167,31 @@ class TestLogin(BaseTest):
 
     # TC10: Nhập sai Mã bảo mật
     def test_tc10_wrong_captcha(self):
-        pytest.skip("Sẽ implement sau")
+        login_page = LoginPage(self.driver)
+        login_page.open_page()
+        
+        # 1. Ép hiển thị CAPTCHA
+        login_page.force_captcha_appear()
+        
+        # Lấy src của ảnh CAPTCHA trước khi ấn Đăng nhập
+        src_truoc = login_page.get_captcha_image_src()
+        
+        # 2. Nhập username, password và cố tình nhập sai CAPTCHA
+        login_page.login_with_captcha("masinhvien_cuaban", "matkhau_cuaban", "MA_SAI_CO_TINH_123")
+        
+        # 3. Kiểm tra thông báo lỗi
+        alert_text = login_page.get_alert_text()
+        if alert_text:
+            assert "mã bảo mật" in alert_text.lower() or "sai" in alert_text.lower(), f"Lỗi hiển thị trên Alert không đúng: {alert_text}"
+        else:
+            page_text = login_page.get_page_source()
+            assert "mã bảo mật" in page_text.lower() or "sai" in page_text.lower(), "Không tìm thấy thông báo lỗi sai mã bảo mật trên trang."
+            
+        # 4. Đợi một chút và kiểm tra xem hệ thống có tự động đổi ảnh CAPTCHA mới không
+        import time
+        time.sleep(2)
+        src_sau = login_page.get_captcha_image_src()
+        assert src_truoc != src_sau, "Lỗi: Ảnh CAPTCHA không được tự động tải lại (src không thay đổi) sau khi nhập sai."
 
     # TC11: Nhập đúng Mã bảo mật, nhưng sai User/Pass
     def test_tc11_correct_captcha_wrong_credentials(self):
