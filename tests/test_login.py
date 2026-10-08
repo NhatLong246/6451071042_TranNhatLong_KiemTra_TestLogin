@@ -44,7 +44,19 @@ class TestLogin(BaseTest):
 
     # TC03: Có nhập Username, để trống Password
     def test_tc03_empty_password(self):
-        pytest.skip("Sẽ implement sau")
+        login_page = LoginPage(self.driver)
+        login_page.open_page()
+        
+        # Nhập username hợp lệ nhưng bỏ trống password
+        login_page.login_with_credentials("masinhvien_cuaban", "")
+        
+        # Kiểm tra kết quả
+        alert_text = login_page.get_alert_text()
+        if alert_text:
+            assert "Bạn chưa nhập mật khẩu" in alert_text, f"Lỗi hiển thị trên Alert không đúng: {alert_text}"
+        else:
+            page_text = login_page.get_page_source()
+            assert "Bạn chưa nhập mật khẩu" in page_text, "Không tìm thấy thông báo lỗi mong đợi trên trang."
 
     # TC04: Đăng nhập bằng phím Enter
     def test_tc04_login_with_enter(self):
