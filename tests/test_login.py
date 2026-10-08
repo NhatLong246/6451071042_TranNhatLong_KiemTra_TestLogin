@@ -111,4 +111,16 @@ class TestLogin(BaseTest):
 
     # TC07: Kích hoạt cơ chế Mã bảo mật
     def test_tc07_trigger_captcha(self):
-        pytest.skip("Sẽ implement sau")
+        login_page = LoginPage(self.driver)
+        login_page.open_page()
+        
+        # Đăng nhập sai 3 lần liên tiếp
+        for i in range(3):
+            login_page.login_with_credentials("user_sai_co_tinh", "pass_sai_co_tinh")
+            # Tắt popup báo lỗi sai tài khoản (nếu có alert) để có thể thao tác tiếp
+            login_page.get_alert_text()
+            
+        # Kiểm tra xem nhãn "Mã bảo mật" (CAPTCHA) có hiện ra trên màn hình không
+        is_captcha_visible = login_page.is_captcha_displayed()
+        
+        assert is_captcha_visible, "Lỗi: Đã đăng nhập sai 3 lần nhưng hệ thống không hiển thị tính năng Mã bảo mật (CAPTCHA) như dự kiến."

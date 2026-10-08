@@ -16,7 +16,8 @@ class LoginPage(BasePage):
     SSO_BUTTON = (By.XPATH, "//a[contains(text(), 'Đăng nhập bằng e-mail UTC')]")
     FORGOT_PWD_LINK = (By.XPATH, "//a[contains(text(), 'Bạn quên mật khẩu đăng nhập')]")
     
-    # (Các locator cho phần mã bảo mật CAPTCHA sẽ được bổ sung sau khi làm đến test case đó)
+    # (Các locator cho phần mã bảo mật CAPTCHA)
+    CAPTCHA_LABEL = (By.XPATH, "//*[contains(text(), 'Mã bảo mật') or contains(text(), 'mã bảo mật')]")
 
     def __init__(self, driver):
         super().__init__(driver)
@@ -87,3 +88,8 @@ class LoginPage(BasePage):
     def get_page_source(self):
         """Lấy toàn bộ HTML của trang để tìm text lỗi (nếu lỗi in thẳng ra màn hình)"""
         return self.driver.page_source
+
+    def is_captcha_displayed(self):
+        """Kiểm tra xem trường Mã bảo mật đã hiển thị trên màn hình hay chưa"""
+        element = self.wait_for_element_visible(self.CAPTCHA_LABEL)
+        return element is not None
