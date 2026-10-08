@@ -28,7 +28,19 @@ class TestLogin(BaseTest):
 
     # TC02: Để trống Username, có nhập Password
     def test_tc02_empty_username(self):
-        pytest.skip("Sẽ implement sau")
+        login_page = LoginPage(self.driver)
+        login_page.open_page()
+        
+        # Bỏ trống username, chỉ nhập password
+        login_page.login_with_credentials("", "matkhau_batky")
+        
+        # Kiểm tra kết quả (Mong đợi giống hệt TC01: Báo lỗi chưa nhập tên đăng nhập)
+        alert_text = login_page.get_alert_text()
+        if alert_text:
+            assert "Bạn chưa nhập tên đăng nhập" in alert_text, f"Lỗi hiển thị trên Alert không đúng: {alert_text}"
+        else:
+            page_text = login_page.get_page_source()
+            assert "Bạn chưa nhập tên đăng nhập" in page_text, "Không tìm thấy thông báo lỗi mong đợi trên trang."
 
     # TC03: Có nhập Username, để trống Password
     def test_tc03_empty_password(self):

@@ -3,11 +3,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
 class BasePage:
-    """
-    Tương đương với BasePage.java
-    Chứa các thao tác chung (common actions) với WebDriver như wait, click, type (send_keys).
-    Giúp tái sử dụng code và dễ bảo trì.
-    """
+
     def __init__(self, driver):
         self.driver = driver
         self.timeout = 10 # Thời gian chờ mặc định là 10 giây
