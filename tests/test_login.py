@@ -60,7 +60,22 @@ class TestLogin(BaseTest):
 
     # TC04: Đăng nhập bằng phím Enter
     def test_tc04_login_with_enter(self):
-        pytest.skip("Sẽ implement sau")
+        login_page = LoginPage(self.driver)
+        login_page.open_page()
+        
+        # Nhập username hợp lệ và password, sau đó ấn phím Enter
+        login_page.login_with_enter("masinhvien", "matkhau")
+        
+        # Kiểm tra đăng nhập thành công: Chờ và kiểm tra URL thay đổi (không còn là trang Login nữa)
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        import pytest
+        try:
+            # Explicit wait chờ URL thay đổi (có thể đăng nhập thành công sẽ chuyển hướng)
+            WebDriverWait(self.driver, 5).until(EC.url_changes(login_page.URL))
+            assert "Login" not in self.driver.current_url, f"Đăng nhập thất bại, vẫn kẹt ở: {self.driver.current_url}"
+        except:
+            pytest.fail("Test thất bại do không thể chuyển trang (bạn cần thay thông tin thật vào code để test pass).")
 
     # TC05: Đăng nhập qua "E-mail UTC" (SSO)
     def test_tc05_sso_login(self):

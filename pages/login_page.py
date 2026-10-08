@@ -45,6 +45,17 @@ class LoginPage(BasePage):
         self.enter_password(password)
         self.click_login()
 
+    def login_with_enter(self, username, password):
+        """Nhập xong user, pass thì ấn phím Enter trên bàn phím"""
+        from selenium.webdriver.common.keys import Keys
+        self.enter_username(username)
+        # Tìm lại ô password, điền pass rồi ấn phím Enter
+        element = self.wait_for_element_visible(self.PASSWORD_INPUT)
+        if element:
+            element.clear()
+            element.send_keys(password)
+            element.send_keys(Keys.ENTER)
+
     def get_alert_text(self):
         """Lấy text từ popup cảnh báo (Alert JS) nếu hệ thống dùng Alert"""
         from selenium.webdriver.support.ui import WebDriverWait
