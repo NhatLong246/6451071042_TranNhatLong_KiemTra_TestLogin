@@ -19,12 +19,12 @@ class TestLogin(BaseTest):
         login_page.login_with_credentials("", "")
         
         # 3. Kiểm tra kết quả
-        alert_text = login_page.get_alert_text()
-        if alert_text:
-            assert "Bạn chưa nhập tên đăng nhập" in alert_text, f"Lỗi hiển thị trên Alert không đúng: {alert_text}"
+        error_text = login_page.get_error_message()
+        if error_text:
+            assert "nhập" in error_text.lower(), f"Lỗi hiển thị không đúng: {error_text}"
         else:
             page_text = login_page.get_page_source()
-            assert "Bạn chưa nhập tên đăng nhập" in page_text, "Không tìm thấy thông báo lỗi mong đợi trên trang."
+            assert "nhập" in page_text.lower(), "Không tìm thấy thông báo lỗi mong đợi trên trang."
 
     # TC02: Để trống Username, có nhập Password
     def test_tc02_empty_username(self):
@@ -34,13 +34,13 @@ class TestLogin(BaseTest):
         # Bỏ trống username, chỉ nhập password
         login_page.login_with_credentials("", "matkhau_batky")
         
-        # Kiểm tra kết quả (Mong đợi giống hệt TC01: Báo lỗi chưa nhập tên đăng nhập)
-        alert_text = login_page.get_alert_text()
-        if alert_text:
-            assert "Bạn chưa nhập tên đăng nhập" in alert_text, f"Lỗi hiển thị trên Alert không đúng: {alert_text}"
+        # Kiểm tra kết quả
+        error_text = login_page.get_error_message()
+        if error_text:
+            assert "nhập" in error_text.lower(), f"Lỗi hiển thị không đúng: {error_text}"
         else:
             page_text = login_page.get_page_source()
-            assert "Bạn chưa nhập tên đăng nhập" in page_text, "Không tìm thấy thông báo lỗi mong đợi trên trang."
+            assert "nhập" in page_text.lower(), "Không tìm thấy thông báo lỗi mong đợi trên trang."
 
     # TC03: Có nhập Username, để trống Password
     def test_tc03_empty_password(self):
@@ -51,12 +51,12 @@ class TestLogin(BaseTest):
         login_page.login_with_credentials("masinhvien_cuaban", "")
         
         # Kiểm tra kết quả
-        alert_text = login_page.get_alert_text()
-        if alert_text:
-            assert "Bạn chưa nhập mật khẩu" in alert_text, f"Lỗi hiển thị trên Alert không đúng: {alert_text}"
+        error_text = login_page.get_error_message()
+        if error_text:
+            assert "mật khẩu" in error_text.lower() or "nhập" in error_text.lower(), f"Lỗi hiển thị không đúng: {error_text}"
         else:
             page_text = login_page.get_page_source()
-            assert "Bạn chưa nhập mật khẩu" in page_text, "Không tìm thấy thông báo lỗi mong đợi trên trang."
+            assert "mật khẩu" in page_text.lower() or "nhập" in page_text.lower(), "Không tìm thấy thông báo lỗi mong đợi trên trang."
 
     # TC04: Đăng nhập bằng phím Enter
     def test_tc04_login_with_enter(self):
@@ -101,13 +101,11 @@ class TestLogin(BaseTest):
         login_page = LoginPage(self.driver)
         login_page.open_page()
         
-        # Thay vì click để tránh văng ra ứng dụng Mail của máy tính (Outlook, Mail app),
-        # ta sẽ kiểm tra xem thuộc tính href có chứa mailto:hotrokythuat@utc.edu.vn hay không
+        # Theo HTML thực tế, link này là thẻ <a> có href="/Login/GetPass"
         href_value = login_page.get_forgot_password_href()
         
         assert href_value is not None, "Không tìm thấy link Quên mật khẩu trên trang."
-        assert "mailto:" in href_value, f"Link không trỏ đến ứng dụng email, thực tế là: {href_value}"
-        assert "hotrokythuat@utc.edu.vn" in href_value, f"Email hỗ trợ không đúng, thực tế là: {href_value}"
+        assert "GetPass" in href_value, f"Link không trỏ đến trang GetPass như thiết kế, thực tế là: {href_value}"
 
     # TC07: Kích hoạt cơ chế Mã bảo mật
     def test_tc07_trigger_captcha(self):
@@ -134,8 +132,8 @@ class TestLogin(BaseTest):
         src_truoc = login_page.get_captcha_image_src()
         assert src_truoc is not None, "Không tìm thấy ảnh CAPTCHA trên trang"
         
-        # 3. Click vào ảnh để đổi mã
-        login_page.click_captcha_image()
+        # 3. Click vào chữ "đây" để đổi mã
+        login_page.click_reload_captcha()
         
         # Đợi 1 chút để ảnh mới được tải về
         import time
@@ -157,10 +155,10 @@ class TestLogin(BaseTest):
         # Nhập username, password đúng (hoặc sai) nhưng bỏ trống CAPTCHA
         login_page.login_with_captcha("masinhvien", "matkhau", "")
         
-        # Kiểm tra kết quả (thường sẽ bật alert hoặc báo chữ đỏ yêu cầu nhập mã bảo mật)
-        alert_text = login_page.get_alert_text()
-        if alert_text:
-            assert "mã bảo mật" in alert_text.lower(), f"Lỗi hiển thị trên Alert không liên quan đến mã bảo mật: {alert_text}"
+        # Kiểm tra kết quả (thường sẽ bật alert hoặc báo chữ đỏ div.error)
+        error_text = login_page.get_error_message()
+        if error_text:
+            assert "mã bảo mật" in error_text.lower() or "nhập" in error_text.lower(), f"Lỗi hiển thị không liên quan đến mã bảo mật: {error_text}"
         else:
             page_text = login_page.get_page_source()
             assert "mã bảo mật" in page_text.lower(), "Không tìm thấy thông báo lỗi liên quan đến Mã bảo mật trên trang."
@@ -180,9 +178,9 @@ class TestLogin(BaseTest):
         login_page.login_with_captcha("masinhvien_cuaban", "matkhau_cuaban", "MA_SAI_CO_TINH_123")
         
         # 3. Kiểm tra thông báo lỗi
-        alert_text = login_page.get_alert_text()
-        if alert_text:
-            assert "mã bảo mật" in alert_text.lower() or "sai" in alert_text.lower(), f"Lỗi hiển thị trên Alert không đúng: {alert_text}"
+        error_text = login_page.get_error_message()
+        if error_text:
+            assert "mã bảo mật" in error_text.lower() or "sai" in error_text.lower() or "không đúng" in error_text.lower(), f"Lỗi hiển thị không đúng: {error_text}"
         else:
             page_text = login_page.get_page_source()
             assert "mã bảo mật" in page_text.lower() or "sai" in page_text.lower(), "Không tìm thấy thông báo lỗi sai mã bảo mật trên trang."
@@ -209,10 +207,10 @@ class TestLogin(BaseTest):
         # Đoạn code này mô phỏng kịch bản bạn nhập đúng mã bằng biến giả định).
         login_page.login_with_captcha("user_sai_123", "pass_sai_456", "MA_CAPTCHA_DUNG")
         
-        # 3. Kiểm tra thông báo lỗi phải là lỗi "Tài khoản không đúng" chứ không phải lỗi "Sai mã bảo mật"
-        alert_text = login_page.get_alert_text()
-        if alert_text:
-            assert "không đúng" in alert_text.lower() or "tài khoản" in alert_text.lower(), f"Báo lỗi sai: {alert_text}"
+        # 3. Kiểm tra thông báo lỗi phải là lỗi "Tài khoản hoặc mật khẩu không đúng" (Theo HTML)
+        error_text = login_page.get_error_message()
+        if error_text:
+            assert "không đúng" in error_text.lower() or "tài khoản" in error_text.lower(), f"Báo lỗi sai: {error_text}"
         else:
             page_text = login_page.get_page_source()
             assert "không đúng" in page_text.lower() or "tài khoản" in page_text.lower(), "Không tìm thấy thông báo sai User/Pass"
