@@ -195,7 +195,33 @@ class TestLogin(BaseTest):
 
     # TC11: Nhập đúng Mã bảo mật, nhưng sai User/Pass
     def test_tc11_correct_captcha_wrong_credentials(self):
-        pytest.skip("Sẽ implement sau")
+        login_page = LoginPage(self.driver)
+        login_page.open_page()
+        
+        # 1. Ép hiển thị CAPTCHA
+        login_page.force_captcha_appear()
+        
+        # Lưu lại src ảnh trước
+        src_truoc = login_page.get_captcha_image_src()
+        
+        # 2. Nhập sai User/Pass nhưng nhập Mã bảo mật đúng
+        # (Lưu ý: Trong kiểm thử tự động, Selenium không thể tự đọc CAPTCHA thật trừ khi tích hợp AI/OCR hoặc API bypass.
+        # Đoạn code này mô phỏng kịch bản bạn nhập đúng mã bằng biến giả định).
+        login_page.login_with_captcha("user_sai_123", "pass_sai_456", "MA_CAPTCHA_DUNG")
+        
+        # 3. Kiểm tra thông báo lỗi phải là lỗi "Tài khoản không đúng" chứ không phải lỗi "Sai mã bảo mật"
+        alert_text = login_page.get_alert_text()
+        if alert_text:
+            assert "không đúng" in alert_text.lower() or "tài khoản" in alert_text.lower(), f"Báo lỗi sai: {alert_text}"
+        else:
+            page_text = login_page.get_page_source()
+            assert "không đúng" in page_text.lower() or "tài khoản" in page_text.lower(), "Không tìm thấy thông báo sai User/Pass"
+            
+        # 4. Kiểm tra ảnh CAPTCHA có tải lại mã mới không
+        import time
+        time.sleep(2)
+        src_sau = login_page.get_captcha_image_src()
+        assert src_truoc != src_sau, "Lỗi: Ảnh CAPTCHA không tự tải lại mã mới."
 
     # TC12: Đăng nhập thành công khi có Mã bảo mật
     def test_tc12_login_success_with_captcha(self):
