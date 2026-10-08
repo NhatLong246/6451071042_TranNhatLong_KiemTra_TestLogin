@@ -149,7 +149,21 @@ class TestLogin(BaseTest):
 
     # TC09: Để trống ô Mã bảo mật
     def test_tc09_empty_captcha(self):
-        pytest.skip("Sẽ implement sau")
+        login_page = LoginPage(self.driver)
+        login_page.open_page()
+        
+        login_page.force_captcha_appear()
+        
+        # Nhập username, password đúng (hoặc sai) nhưng bỏ trống CAPTCHA
+        login_page.login_with_captcha("masinhvien", "matkhau", "")
+        
+        # Kiểm tra kết quả (thường sẽ bật alert hoặc báo chữ đỏ yêu cầu nhập mã bảo mật)
+        alert_text = login_page.get_alert_text()
+        if alert_text:
+            assert "mã bảo mật" in alert_text.lower(), f"Lỗi hiển thị trên Alert không liên quan đến mã bảo mật: {alert_text}"
+        else:
+            page_text = login_page.get_page_source()
+            assert "mã bảo mật" in page_text.lower(), "Không tìm thấy thông báo lỗi liên quan đến Mã bảo mật trên trang."
 
     # TC10: Nhập sai Mã bảo mật
     def test_tc10_wrong_captcha(self):

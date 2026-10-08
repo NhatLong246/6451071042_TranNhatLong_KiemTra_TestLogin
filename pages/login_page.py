@@ -74,6 +74,17 @@ class LoginPage(BasePage):
             element.send_keys(password)
             element.send_keys(Keys.ENTER)
 
+    def enter_captcha(self, captcha_code):
+        """Nhập mã CAPTCHA"""
+        self.enter_text(self.CAPTCHA_INPUT, captcha_code)
+
+    def login_with_captcha(self, username, password, captcha_code):
+        """Hàm gộp: Đăng nhập đầy đủ gồm cả CAPTCHA"""
+        self.enter_username(username)
+        self.enter_password(password)
+        self.enter_captcha(captcha_code)
+        self.click_login()
+
     def get_alert_text(self):
         """Lấy text từ popup cảnh báo (Alert JS) nếu hệ thống dùng Alert"""
         from selenium.webdriver.support.ui import WebDriverWait
