@@ -124,6 +124,9 @@ class LoginPage(BasePage):
         """Hàm tiện ích: Cố tình đăng nhập sai 3 lần để ép hệ thống hiện CAPTCHA"""
         for _ in range(3):
             self.login_with_credentials("user_sai", "pass_sai")
+            # Cực kỳ quan trọng: Phải chờ hệ thống tải lại trang và hiện thông báo lỗi
+            # rồi mới được nhập tiếp, nếu không tool chạy quá nhanh sẽ bị lỗi StaleElement
+            self.get_error_message()
 
     def click_reload_captcha(self):
         """Click vào thẻ <a> chữ 'đây' để yêu cầu mã mới thay vì click vào ảnh"""
