@@ -225,4 +225,23 @@ class TestLogin(BaseTest):
 
     # TC12: Đăng nhập thành công khi có Mã bảo mật
     def test_tc12_login_success_with_captcha(self):
-        pytest.skip("Sẽ implement sau")
+        login_page = LoginPage(self.driver)
+        login_page.open_page()
+        
+        # 1. Ép hiển thị CAPTCHA
+        login_page.force_captcha_appear()
+        
+        # 2. Nhập ĐÚNG Username, Password và Mã bảo mật
+        # (Lưu ý: Test case này sẽ fail trên thực tế nếu không điền đúng mã CAPTCHA thật sinh ra lúc chạy)
+        login_page.login_with_captcha("masinhvien_cuaban", "matkhau_cuaban", "MA_CAPTCHA_DUNG")
+        
+        # 3. Kiểm tra chuyển trang thành công (hệ thống điều hướng vào trong)
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        import pytest
+        try:
+            # Explicit wait chờ hệ thống chuyển URL sau khi login thành công
+            WebDriverWait(self.driver, 5).until(EC.url_changes(login_page.URL))
+            assert "Login" not in self.driver.current_url, f"Đăng nhập thất bại, vẫn kẹt ở trang: {self.driver.current_url}"
+        except:
+            pytest.fail("Test thất bại do hệ thống không chuyển hướng (cần điền thông tin thật để pass).")
