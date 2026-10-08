@@ -79,7 +79,22 @@ class TestLogin(BaseTest):
 
     # TC05: Đăng nhập qua "E-mail UTC" (SSO)
     def test_tc05_sso_login(self):
-        pytest.skip("Sẽ implement sau")
+        login_page = LoginPage(self.driver)
+        login_page.open_page()
+        
+        # Click nút đăng nhập bằng Email UTC
+        login_page.click_sso_login()
+        
+        # Chờ và kiểm tra xem URL có chuyển hướng khỏi trang đăng nhập nội bộ không
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        import pytest
+        try:
+            # Explicit wait chờ URL thay đổi (hệ thống sẽ gọi sang trang SSO của Google/Microsoft)
+            WebDriverWait(self.driver, 5).until(EC.url_changes(login_page.URL))
+            assert "Login" not in self.driver.current_url, f"Không chuyển hướng được sang SSO, vẫn ở: {self.driver.current_url}"
+        except:
+            pytest.fail("Test thất bại do không thể click nút SSO hoặc trang không phản hồi.")
 
     # TC06: Chức năng "Quên mật khẩu"
     def test_tc06_forgot_password(self):

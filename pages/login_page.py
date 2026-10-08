@@ -45,6 +45,10 @@ class LoginPage(BasePage):
         self.enter_password(password)
         self.click_login()
 
+    def click_sso_login(self):
+        """Click nút Đăng nhập bằng e-mail UTC"""
+        self.click_element(self.SSO_BUTTON)
+
     def login_with_enter(self, username, password):
         """Nhập xong user, pass thì ấn phím Enter trên bàn phím"""
         from selenium.webdriver.common.keys import Keys
